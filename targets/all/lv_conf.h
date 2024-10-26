@@ -1,0 +1,19 @@
+/*
+ * Copyright (c) 2024 triaxis s.r.o.
+ * Licensed under the MIT license. See LICENSE.txt file in the repository root
+ * for full license information.
+ *
+ * lv_conf.h
+ *
+ * Basic configuration, when overriding from app you can #include_next
+ * this or override in full.
+ */
+
+#pragma once
+
+#define LV_CONF_H
+
+#define LV_USE_LOG  1
+
+#define LV_USE_STDLIB_MALLOC    LV_STDLIB_CLIB
+#define LV_USE_STDLIB_STRING    LV_STDLIB_CLIB
