@@ -38,3 +38,46 @@ OPTIMIZE void lv_draw_arm_blend_color_to_i1(bool set, lv_draw_sw_blend_fill_dsc_
         p += 4;
     }
 }
+
+
+OPTIMIZE void lv_draw_arm_blend_color_to_i1_mask(bool set, lv_draw_sw_blend_fill_dsc_t * dsc)
+{
+    unsigned w = dsc->dest_w;
+    unsigned o = dsc->relative_area.x1 & 7;
+    auto p = (uint8_t*)dsc->dest_buf;
+    unsigned s = dsc->dest_stride;
+    auto e = p + s * dsc->dest_h;
+    auto pm = dsc->mask_buf;
+    unsigned sm = dsc->mask_stride;
+
+    while (w)
+    {
+        unsigned n = 32 - o;
+        if (n > w) { n = w; }
+
+        auto ppm = pm;
+        for (auto pp = p; pp < e; pp += s, ppm += sm)
+        {
+            uint32_t mask = 0;
+            for (int mn = n - 1; mn >= 0; mn--) {
+                mask = mask << 1 | ppm[mn] >> 7;
+            }
+            mask <<= o;
+            mask = __REV(__RBIT(mask));
+
+            if (set)
+            {
+                *(uint32_t*)pp |= mask;
+            }
+            else
+            {
+
+                *(uint32_t*)pp &= ~mask;
+            }
+        }
+        o = 0;
+        p += 4;
+        pm += n;
+        w -= n;
+    }
+}

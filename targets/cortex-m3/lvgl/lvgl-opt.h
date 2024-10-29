@@ -15,5 +15,7 @@
 #include <lvgl.h>
 
 EXTERN_C void lv_draw_arm_blend_color_to_i1(bool set, lv_draw_sw_blend_fill_dsc_t * dsc);
+EXTERN_C void lv_draw_arm_blend_color_to_i1_mask(bool set, lv_draw_sw_blend_fill_dsc_t * dsc);
 
 #define LV_DRAW_SW_COLOR_BLEND_TO_I1(dsc)    (lv_draw_arm_blend_color_to_i1(src_color, dsc), LV_RESULT_OK)
+#define LV_DRAW_SW_COLOR_BLEND_TO_I1_WITH_MASK(dsc)    (lv_draw_arm_blend_color_to_i1_mask(src_color, dsc), LV_RESULT_OK)
