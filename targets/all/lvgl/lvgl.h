@@ -22,11 +22,10 @@ class Lvgl
 {
 public:
     //! Intializes display of a specified size using the specified driver
-    void Initialize(Display& display, int width, int height, lv_color_format_t colorFormat = LV_COLOR_FORMAT_NATIVE);
+    void Initialize(Display& display, AsyncDelegate<> render, int width, int height, lv_color_format_t colorFormat = LV_COLOR_FORMAT_NATIVE);
 
 private:
-    async(Handler);
-    async(Refresh);
+    async(Task);
 
     static void LvInvalidate(lv_event_t* e);
     void Invalidate(lv_area_t* area);
@@ -34,18 +33,9 @@ private:
     void Flush(const lv_area_t* area, uint8_t* px_map);
 
     Display* disp;
+    AsyncDelegate<> render;
     lv_disp_t* lvd;
-
-    enum class Signal
-    {
-        Refresh = 1,
-        Tick = 2,
-    } signals;
-
-    DECLARE_FLAG_ENUM(Signal);
 };
-
-DEFINE_FLAG_ENUM(Lvgl::Signal);
 
 extern Lvgl lvgl;
 

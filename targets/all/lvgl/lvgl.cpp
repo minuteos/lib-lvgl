@@ -42,11 +42,12 @@ static uint32_t tick_cb()
     return ((state.t64 += elapsed) * ((int64_t)1000 << 17)) >> 32;
 }
 
-void Lvgl::Initialize(Display& disp, int width, int height, lv_color_format_t colorFormat)
+void Lvgl::Initialize(Display& disp, AsyncDelegate<> render, int width, int height, lv_color_format_t colorFormat)
 {
     lv_init();
 
     this->disp = &disp;
+    this->render = render;
     lvd = lv_display_create(width, height);
     lv_display_set_color_format(lvd, colorFormat);
     lv_display_set_user_data(lvd, this);
@@ -79,8 +80,7 @@ void Lvgl::Initialize(Display& disp, int width, int height, lv_color_format_t co
     lv_display_delete_refr_timer(lvd);
     lv_obj_invalidate(lvd->act_scr);
 
-    kernel::Task::Run(this, &Lvgl::Handler);
-    kernel::Task::Run(this, &Lvgl::Refresh);
+    kernel::Task::Run(this, &Lvgl::Task);
 }
 
 void Lvgl::LvInvalidate(lv_event_t * e)
@@ -93,7 +93,6 @@ void Lvgl::LvInvalidate(lv_event_t * e)
 void Lvgl::Invalidate(lv_area_t* area)
 {
     disp->AdjustFlushArea(area);
-    signals |= Signal::Refresh;
 }
 
 void Lvgl::LvFlush(lv_display_t * display, const lv_area_t * area, uint8_t * px_map)
@@ -113,53 +112,39 @@ void Lvgl::Flush(const lv_area_t* area, uint8_t* px_map)
     lvd->flushing = false;
 }
 
-async(Lvgl::Handler)
+async(Lvgl::Task)
 async_def(
-#if LVGL_DIAG & LVGL_DIAG_HANDLER
+#if LVGL_DIAG & (LVGL_DIAG_HANDLER | LVGL_DIAG_REFRESH)
     uint32_t start;
 #endif
 )
 {
     for (;;)
     {
+        // ask the app to update display
+        await(render);
+
+        // call the LVGL handler
 #if LVGL_DIAG & LVGL_DIAG_HANDLER
         f.start = MONO_US;
 #endif
-        auto wait = lv_timer_handler();
+        UNUSED auto wait = await(kernel::Worker::Run, lv_timer_handler);
 #if LVGL_DIAG & LVGL_DIAG_HANDLER
         MYDBG("Handler: %.3q ms, wait %d ms", MONO_US - f.start, wait);
 #endif
-        await_acquire_zero_ms(signals, Signal::Tick, wait);
-    }
-}
-async_end
 
-async(Lvgl::Refresh)
-async_def(
-#if LVGL_DIAG & LVGL_DIAG_REFRESH
-    uint32_t start;
-#endif
-)
-{
-    for (;;)
-    {
-        // wait for a good time to update the buffer
-        await_acquire_zero(signals, Signal::Refresh);
+        // wait for a good time to refresh
+        await(disp->Sync);
 
         // update the display
 #if LVGL_DIAG & LVGL_DIAG_REFRESH
+        MYDBG("Refresh start");
         f.start = MONO_US;
 #endif
-        _lv_display_refr_timer(NULL);
+        await(kernel::Worker::RunWithOptions, { .stack = 4096 }, _lv_display_refr_timer, (lv_timer_t*)NULL);
 #if LVGL_DIAG & LVGL_DIAG_REFRESH
         MYDBG("Refresh: %.3q ms", MONO_US - f.start);
 #endif
-
-        // always trigger a timer handler after refresh
-        signals |= Signal::Tick;
-
-        // wait for the refresh to complete
-        await(disp->Sync);
     }
 }
 async_end

@@ -29,7 +29,7 @@ public:
      */
     virtual void Flush(const lv_area_t* area, const uint8_t* data) = 0;
     //! Should return after the last flushed data is visible on display, i.e. next frame can be prepared
-    virtual async(Sync) = 0;
+    virtual async_once(Sync) = 0;
 };
 
 }
