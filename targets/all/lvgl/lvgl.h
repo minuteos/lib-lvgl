@@ -15,6 +15,10 @@
 #include <lvgl.h>
 #include <lvgl/Display.h>
 
+#include <lvgl/Object.h>
+#include <lvgl/Screen.h>
+#include <lvgl/Widgets.h>
+
 namespace lvgl
 {
 
