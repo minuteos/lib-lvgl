@@ -22,7 +22,7 @@ class Lvgl
 {
 public:
     //! Intializes display of a specified size using the specified driver
-    void Initialize(Display& display, AsyncDelegate<> render, int width, int height, lv_color_format_t colorFormat = LV_COLOR_FORMAT_NATIVE);
+    void Initialize(Display& display, AsyncDelegate<> render, int width, int height, lv_color_format_t colorFormat = LV_COLOR_FORMAT_NATIVE, int bufferSplit = 1);
 
 private:
     async(Task);
@@ -30,7 +30,7 @@ private:
     static void LvInvalidate(lv_event_t* e);
     void Invalidate(lv_area_t* area);
     static void LvFlush(lv_display_t* display, const lv_area_t* area, uint8_t* px_map);
-    void Flush(const lv_area_t* area, uint8_t* px_map);
+    void Flush(const lv_area_t* area, uint8_t* px_map, size_t stride, bool last);
 
     Display* disp;
     AsyncDelegate<> render;

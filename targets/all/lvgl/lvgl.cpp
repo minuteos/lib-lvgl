@@ -42,7 +42,7 @@ static uint32_t tick_cb()
     return ((state.t64 += elapsed) * ((int64_t)1000 << 17)) >> 32;
 }
 
-void Lvgl::Initialize(Display& disp, AsyncDelegate<> render, int width, int height, lv_color_format_t colorFormat)
+void Lvgl::Initialize(Display& disp, AsyncDelegate<> render, int width, int height, lv_color_format_t colorFormat, int bufferSplit)
 {
     lv_init();
 
@@ -67,9 +67,9 @@ void Lvgl::Initialize(Display& disp, AsyncDelegate<> render, int width, int heig
     int fbHeight = dispArea.y2 - dispArea.y1 + 1;
 
     // allocate buffers
-    const unsigned bufSize = fbStride * fbHeight + 8;
+    int bufHeight = (fbHeight + bufferSplit - 1) / bufferSplit;
+    const unsigned bufSize = fbStride * bufHeight + 8;
     auto fb = malloc(bufSize);
-    disp.BufferSize(fbStride, fbHeight);
 
     // initalize buffers and events
     lv_display_set_buffers(lvd, fb, NULL, bufSize, LV_DISPLAY_RENDER_MODE_PARTIAL);
@@ -99,16 +99,16 @@ void Lvgl::LvFlush(lv_display_t * display, const lv_area_t * area, uint8_t * px_
 {
     auto instance = (Lvgl*)display->user_data;
     ASSERT(display == instance->lvd);
-    instance->Flush(area, px_map);
+    instance->Flush(area, px_map, display->layer_head->draw_buf->header.stride, display->flushing_last);
 }
 
-void Lvgl::Flush(const lv_area_t* area, uint8_t* px_map)
+void Lvgl::Flush(const lv_area_t* area, uint8_t* px_map, size_t stride, bool last)
 {
     if (lvd->color_format == LV_COLOR_FORMAT_I1)
     {
         px_map += 8;
     }
-    disp->Flush(area, px_map);
+    disp->Flush(area, px_map, stride, last);
     lvd->flushing = false;
 }
 
@@ -132,9 +132,6 @@ async_def(
 #if LVGL_DIAG & LVGL_DIAG_HANDLER
         MYDBG("Handler: %.3q ms, wait %d ms", MONO_US - f.start, wait);
 #endif
-
-        // wait for a good time to refresh
-        await(disp->Sync);
 
         // update the display
 #if LVGL_DIAG & LVGL_DIAG_REFRESH

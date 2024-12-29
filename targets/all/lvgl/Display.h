@@ -19,17 +19,15 @@ namespace lvgl
 class Display
 {
 public:
-    //! Informs the driver of the LVGL buffer size so it can initialize its own internal buffer
-    virtual void BufferSize(size_t stride, size_t rows) = 0;
     //! Adusts the area to be flushed so it satisfies any constraints required by the display
     virtual void AdjustFlushArea(lv_area_t* area) = 0;
     //! Asks the driver to flush the specified area to output display
     /*!
-     * Note: @param data is assumed to be reusable after this method returns
+     * @param data pixel data to update, assumed to be reusable after this method returns
+     * @param stride specifies the stride of one row of pixel data
+     * @param last is true for the last flush that is part of one refresh
      */
-    virtual void Flush(const lv_area_t* area, const uint8_t* data) = 0;
-    //! Should return after the last flushed data is visible on display, i.e. next frame can be prepared
-    virtual async_once(Sync) = 0;
+    virtual void Flush(const lv_area_t* area, const uint8_t* data, size_t stride, bool last) = 0;
 };
 
 }
