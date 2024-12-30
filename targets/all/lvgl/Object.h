@@ -65,25 +65,32 @@ public:
 
 #define LV_STYLE_HELPER(name, style, type, value, ...) \
     ALWAYS_INLINE FLATTEN void Set ## name(type value, lv_style_selector_t selector = LV_PART_MAIN | LV_STATE_DEFAULT) \
-        { __VA_ARGS__; SetStyle(style, value, selector); } \
+        { __VA_ARGS__; lv_obj_set_local_style_prop(*this, style, { .ptr = unsafe_cast<const void*>(value) }, selector); } \
     ALWAYS_INLINE FLATTEN type Get ## name(lv_part_t part = LV_PART_MAIN) \
-        { auto res = GetStyle(style, part); return *(const type*)&res; }
+        { return unsafe_cast<type>(GetStyle(style, part)); }
 
     LV_STYLE_HELPER(Layout, LV_STYLE_LAYOUT, lv_layout_t, layout)
 
-    LV_STYLE_HELPER(FlexFlow, LV_STYLE_FLEX_FLOW, lv_flex_flow_t, flow, SetLayout(LV_LAYOUT_FLEX))
-    LV_STYLE_HELPER(FlexAlignMain, LV_STYLE_FLEX_MAIN_PLACE, lv_flex_align_t, align)
-    LV_STYLE_HELPER(FlexAlignCross, LV_STYLE_FLEX_CROSS_PLACE, lv_flex_align_t, align)
-    LV_STYLE_HELPER(FlexAlignTrack, LV_STYLE_FLEX_TRACK_PLACE, lv_flex_align_t, align)
-    ALWAYS_INLINE FLATTEN void SetFlexAlign(lv_flex_align_t main, lv_flex_align_t cross, lv_flex_align_t track)
-        { SetFlexAlignMain(main); SetFlexAlignCross(cross); SetFlexAlignTrack(track); }
-    LV_STYLE_HELPER(FlexGapRow, LV_STYLE_PAD_ROW, int, gap)
-    LV_STYLE_HELPER(FlexGapColumn, LV_STYLE_PAD_COLUMN, int, gap)
-    ALWAYS_INLINE FLATTEN void SetFlexGap(int row, int column)
-        { SetFlexGapRow(row); SetFlexGapColumn(column); }
-    ALWAYS_INLINE FLATTEN void SetFlexGap(int gap)
-        { SetFlexGap(gap, gap); }
+#if LV_USE_FLEX
     LV_STYLE_HELPER(FlexGrow, LV_STYLE_FLEX_GROW, uint8_t, grow)
+#endif
+
+#if LV_USE_GRID
+    LV_STYLE_HELPER(GridColumn, LV_STYLE_GRID_CELL_COLUMN_POS, int, column)
+    LV_STYLE_HELPER(GridColumnSpan, LV_STYLE_GRID_CELL_COLUMN_SPAN, int, span)
+    LV_STYLE_HELPER(GridColumnAlign, LV_STYLE_GRID_CELL_X_ALIGN, lv_grid_align_t, align)
+
+    LV_STYLE_HELPER(GridRow, LV_STYLE_GRID_CELL_ROW_POS, int, row)
+    LV_STYLE_HELPER(GridRowSpan, LV_STYLE_GRID_CELL_ROW_SPAN, int, span)
+    LV_STYLE_HELPER(GridRowAlign, LV_STYLE_GRID_CELL_Y_ALIGN, lv_grid_align_t, align)
+
+    ALWAYS_INLINE FLATTEN void SetGridPlacement(int column, int row)
+        { SetGridColumn(column); SetGridRow(row); }
+    ALWAYS_INLINE FLATTEN void SetGridSpan(int columnSpan, int rowSpan)
+        { SetGridColumnSpan(columnSpan); SetGridRowSpan(rowSpan); }
+    ALWAYS_INLINE FLATTEN void SetGridAlign(lv_grid_align_t colAlign, lv_grid_align_t rowAlign)
+        { SetGridColumnAlign(colAlign); SetGridRowAlign(rowAlign); }
+#endif
 
     LV_STYLE_HELPER(BorderWidth, LV_STYLE_BORDER_WIDTH, int, width)
     LV_STYLE_HELPER(BorderColor, LV_STYLE_BORDER_COLOR, lv_color_t, color)
@@ -134,7 +141,5 @@ public:
     LvObject(lv_obj_t* parent)
         : Object(GetClass<LvType>(), parent) {}
 };
-
-using Container = LvObject<lv_obj_t>;
 
 }
