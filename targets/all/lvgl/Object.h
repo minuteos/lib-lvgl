@@ -51,6 +51,8 @@ public:
         }
     }
 
+    void SetPosition(int32_t x, int32_t y)
+        { lv_obj_set_pos(obj, x, y); }
     void SetSize(int32_t width, int32_t height)
         { lv_obj_set_size(obj, width, height); }
 
