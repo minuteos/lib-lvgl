@@ -75,6 +75,11 @@ public:
     LV_STYLE_HELPER(Font, LV_STYLE_TEXT_FONT, ptr, const lv_font_t*, font);
     LV_STYLE_HELPER(Layout, LV_STYLE_LAYOUT, num, lv_layout_t, layout)
 
+    LV_STYLE_HELPER(TranslateX, LV_STYLE_TRANSLATE_X, num, int, x);
+    LV_STYLE_HELPER(TranslateY, LV_STYLE_TRANSLATE_X, num, int, Y);
+    ALWAYS_INLINE FLATTEN void SetTranslate(int x, int y)
+         { SetTranslateX(x); SetTranslateY(y); }
+
 #if LV_USE_FLEX
     LV_STYLE_HELPER(FlexGrow, LV_STYLE_FLEX_GROW, num, uint8_t, grow)
 #endif
