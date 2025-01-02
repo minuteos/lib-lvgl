@@ -95,13 +95,18 @@ public:
     ALWAYS_INLINE FLATTEN type Get ## name(lv_part_t part = LV_PART_MAIN) \
         { return (type)GetStyle(style, part).stype; }
 
-    LV_STYLE_HELPER(Font, LV_STYLE_TEXT_FONT, ptr, const lv_font_t*, font);
+    LV_STYLE_HELPER(Font, LV_STYLE_TEXT_FONT, ptr, const lv_font_t*, font)
     LV_STYLE_HELPER(Layout, LV_STYLE_LAYOUT, num, lv_layout_t, layout)
+    LV_STYLE_HELPER(Align, LV_STYLE_ALIGN, num, lv_align_t, align)
+    LV_STYLE_HELPER(Radius, LV_STYLE_RADIUS, num, int, radius)
 
-    LV_STYLE_HELPER(TranslateX, LV_STYLE_TRANSLATE_X, num, int, x);
-    LV_STYLE_HELPER(TranslateY, LV_STYLE_TRANSLATE_X, num, int, Y);
+    LV_STYLE_HELPER(TranslateX, LV_STYLE_TRANSLATE_X, num, int, x)
+    LV_STYLE_HELPER(TranslateY, LV_STYLE_TRANSLATE_Y, num, int, y)
     ALWAYS_INLINE FLATTEN void SetTranslate(int x, int y)
          { SetTranslateX(x); SetTranslateY(y); }
+
+    LV_STYLE_HELPER(Width, LV_STYLE_WIDTH, num, int, width)
+    LV_STYLE_HELPER(Height, LV_STYLE_HEIGHT, num, int, height)
 
 #if LV_USE_FLEX
     LV_STYLE_HELPER(FlexGrow, LV_STYLE_FLEX_GROW, num, uint8_t, grow)
@@ -124,27 +129,33 @@ public:
         { SetGridColumnAlign(colAlign); SetGridRowAlign(rowAlign); }
 #endif
 
+    LV_STYLE_HELPER(BackgroundColor, LV_STYLE_BG_COLOR, color, lv_color_t, color)
+    LV_STYLE_HELPER(BackgroundOpacity, LV_STYLE_BG_OPA, num, uint8_t, opacity)
+    ALWAYS_INLINE FLATTEN void SetBackground(lv_color_t color, uint8_t opacity = 255)
+        { SetBackgroundColor(color); SetBackgroundOpacity(opacity); }
+
     LV_STYLE_HELPER(BorderWidth, LV_STYLE_BORDER_WIDTH, num, int, width)
     LV_STYLE_HELPER(BorderColor, LV_STYLE_BORDER_COLOR, color, lv_color_t, color)
     LV_STYLE_HELPER(BorderSide, LV_STYLE_BORDER_SIDE, num, lv_border_side_t, side)
-    ALWAYS_INLINE FLATTEN void SetBorder(int width, lv_color_t color, lv_border_side_t side, lv_style_selector_t selector = LV_PART_MAIN | LV_STATE_DEFAULT)
+    ALWAYS_INLINE FLATTEN void SetBorder(int width, lv_color_t color, lv_border_side_t side = LV_BORDER_SIDE_FULL, lv_style_selector_t selector = LV_PART_MAIN | LV_STATE_DEFAULT)
         { SetBorderWidth(width, selector); SetBorderColor(color, selector); SetBorderSide(side, selector); }
 
     LV_STYLE_HELPER(TextColor, LV_STYLE_TEXT_COLOR, color, lv_color_t, color)
+    LV_STYLE_HELPER(TextAlign, LV_STYLE_TEXT_ALIGN, num, lv_text_align_t, align)
 
-    LV_STYLE_HELPER(PaddingTop, LV_STYLE_PAD_TOP, num, int, padding);
-    LV_STYLE_HELPER(PaddingBottom, LV_STYLE_PAD_BOTTOM, num, int, padding);
-    LV_STYLE_HELPER(PaddingLeft, LV_STYLE_PAD_LEFT, num, int, padding);
-    LV_STYLE_HELPER(PaddingRight, LV_STYLE_PAD_RIGHT, num, int, padding);
+    LV_STYLE_HELPER(PaddingTop, LV_STYLE_PAD_TOP, num, int, padding)
+    LV_STYLE_HELPER(PaddingBottom, LV_STYLE_PAD_BOTTOM, num, int, padding)
+    LV_STYLE_HELPER(PaddingLeft, LV_STYLE_PAD_LEFT, num, int, padding)
+    LV_STYLE_HELPER(PaddingRight, LV_STYLE_PAD_RIGHT, num, int, padding)
     ALWAYS_INLINE FLATTEN void SetPadding(int vertical, int horizontal)
         { SetPaddingTop(vertical); SetPaddingBottom(vertical); SetPaddingLeft(horizontal); SetPaddingRight(horizontal); }
     ALWAYS_INLINE FLATTEN void SetPadding(int padding)
         { SetPadding(padding, padding); }
 
-    LV_STYLE_HELPER(MarginTop, LV_STYLE_MARGIN_TOP, num, int, margin);
-    LV_STYLE_HELPER(MarginBottom, LV_STYLE_MARGIN_BOTTOM, num, int, margin);
-    LV_STYLE_HELPER(MarginLeft, LV_STYLE_MARGIN_LEFT, num, int, margin);
-    LV_STYLE_HELPER(MarginRight, LV_STYLE_MARGIN_RIGHT, num, int, margin);
+    LV_STYLE_HELPER(MarginTop, LV_STYLE_MARGIN_TOP, num, int, margin)
+    LV_STYLE_HELPER(MarginBottom, LV_STYLE_MARGIN_BOTTOM, num, int, margin)
+    LV_STYLE_HELPER(MarginLeft, LV_STYLE_MARGIN_LEFT, num, int, margin)
+    LV_STYLE_HELPER(MarginRight, LV_STYLE_MARGIN_RIGHT, num, int, margin)
     ALWAYS_INLINE FLATTEN void SetMargin(int vertical, int horizontal)
         { SetMarginTop(vertical); SetMarginBottom(vertical); SetMarginLeft(horizontal); SetMarginRight(horizontal); }
     ALWAYS_INLINE FLATTEN void SetMargin(int margin)

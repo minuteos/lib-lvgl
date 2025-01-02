@@ -24,6 +24,8 @@ class Label : public LvObject<lv_label_t>
 public:
     Label(ObjRef parent) : LvObject(parent) {}
 
+    void SetText(const char* text)
+        { lv_label_set_text(Obj(), text); }
     template<typename... Args> void SetTextFormat(const char* format, Args... args)
         { lv_label_set_text_fmt(*this, format, args...); }
 };
