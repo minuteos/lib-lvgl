@@ -17,10 +17,33 @@
 namespace lvgl
 {
 
+class Object;
+
+class ObjRef
+{
+    lv_obj_t* obj;
+
+public:
+    constexpr ObjRef(lv_obj_t* obj) : obj(obj) {}
+    constexpr ObjRef(const Object* obj);
+    constexpr ObjRef(const Object& obj);
+
+    constexpr operator lv_obj_t*() const { return obj; }
+};
+
 class Object
 {
 public:
-    Object(const lv_obj_class_t& cls, lv_obj_t* parent)
+    typedef Object* (*factory_t)(ObjRef parent);
+    template<typename Type> static factory_t GetFactory()
+    {
+        return +[](ObjRef parent) { return (Object*)new Type(parent); };
+    }
+
+    // delete the copy ctor, it is very dangerous when invoked accidentally
+    Object(const Object&) = delete;
+
+    Object(const lv_obj_class_t& cls, ObjRef parent)
     {
         obj = lv_obj_class_create_obj(&cls, parent);
         obj->user_data = this;
@@ -32,8 +55,8 @@ public:
         lv_obj_delete(obj);
     }
 
+    constexpr lv_obj_t* Obj() const { return obj; }
     constexpr operator lv_obj_t*() const { return obj; }
-    constexpr operator lv_obj_t*() { return obj; }
 
     void UpdateTree()
     {
@@ -147,8 +170,11 @@ LV_BIND_CLASS(lv_obj_t, lv_obj_class);
 template<typename LvType = lv_obj_t> class LvObject : public Object
 {
 public:
-    LvObject(lv_obj_t* parent)
+    LvObject(ObjRef parent)
         : Object(GetClass<LvType>(), parent) {}
 };
+
+constexpr ObjRef::ObjRef(const Object* obj) : obj(obj ? obj->Obj() : NULL) {}
+constexpr ObjRef::ObjRef(const Object& obj) : obj(obj.Obj()) {}
 
 }

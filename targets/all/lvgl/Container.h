@@ -16,7 +16,7 @@ namespace lvgl
 class Container : public LvObject<lv_obj_t>
 {
 public:
-    Container(lv_obj_t* parent) : LvObject(parent) {}
+    Container(ObjRef parent) : LvObject(parent) {}
 
 #if LV_USE_FLEX
     LV_STYLE_HELPER(FlexFlow, LV_STYLE_FLEX_FLOW, num, lv_flex_flow_t, flow, SetLayout(LV_LAYOUT_FLEX))

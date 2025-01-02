@@ -16,7 +16,7 @@ namespace lvgl
 class Screen : public Container
 {
 public:
-    Screen() : Container(NULL) {}
+    Screen() : Container((lv_obj_t*)NULL) {}
 
     void Load() { lv_screen_load(*this); }
 };

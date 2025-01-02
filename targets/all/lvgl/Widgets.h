@@ -22,7 +22,7 @@ LV_BIND_CLASS(lv_label_t, lv_label_class);
 class Label : public LvObject<lv_label_t>
 {
 public:
-    Label(lv_obj_t* parent) : LvObject(parent) {}
+    Label(ObjRef parent) : LvObject(parent) {}
 
     template<typename... Args> void SetTextFormat(const char* format, Args... args)
         { lv_label_set_text_fmt(*this, format, args...); }
@@ -37,7 +37,7 @@ LV_BIND_CLASS(lv_image_t, lv_image_class);
 class Image : public LvObject<lv_image_t>
 {
 public:
-    Image(lv_obj_t* parent) : LvObject(parent) {}
+    Image(ObjRef parent) : LvObject(parent) {}
 };
 
 #endif
