@@ -26,6 +26,7 @@ extern "C" void logcb(lv_log_level_t level, const char * buf)
 namespace lvgl
 {
 
+INIT_PRIORITY(-5000)
 Lvgl lvgl;
 
 static uint32_t tick_cb()
