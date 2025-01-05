@@ -40,6 +40,7 @@ private:
     Display* disp;
     AsyncDelegate<> render;
     lv_disp_t* lvd;
+    uint8_t stack[LV_DRAW_THREAD_STACK_SIZE];
 };
 
 extern Lvgl lvgl;
