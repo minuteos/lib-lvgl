@@ -167,8 +167,37 @@ public:
 protected:
     virtual void Update() {}
 
+    template<auto Handler> void AddEvent(lv_event_code_t event = __EventThunk<Handler>::DefaultEvent)
+    {
+        lv_obj_add_event_cb(obj, __EventThunk<Handler>::cb, event, this);
+    }
+
+    void AddToGroup(lv_group_t* group = lv_group_get_default()) { lv_group_add_obj(group, obj); }
+    void AddFlag(lv_obj_flag_t flag) { lv_obj_add_flag(obj, flag); }
+    void AddState(lv_state_t state) { lv_obj_add_state(obj, state); }
+    void RemoveFlag(lv_obj_flag_t flag) { lv_obj_remove_flag(obj, flag); }
+    void RemoveState(lv_state_t state) { lv_obj_remove_state(obj, state); }
+
 private:
     lv_obj_t* obj = NULL;
+
+    template<auto Handler> struct __EventThunk {};
+    template<typename Owner, void (Owner::*Handler)(lv_event_t&)> struct __EventThunk<Handler>
+    {
+        static void cb(lv_event_t* evt)
+        {
+            (((Owner*)evt->user_data)->*Handler)(*evt);
+        }
+    };
+
+    template<typename Owner, void (Owner::*Handler)(lv_key_t)> struct __EventThunk<Handler>
+    {
+        static constexpr lv_event_code_t DefaultEvent = LV_EVENT_KEY;
+        static void cb(lv_event_t* evt)
+        {
+            (((Owner*)evt->user_data)->*Handler)(*(lv_key_t*)evt->param);
+        }
+    };
 };
 
 template<typename LvType> constexpr const lv_obj_class_t& GetClass() { static_assert(false, "Unsupported lv_obj class"); return lv_obj_class; }
