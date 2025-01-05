@@ -131,8 +131,8 @@ public:
 
     LV_STYLE_HELPER(BackgroundColor, LV_STYLE_BG_COLOR, color, lv_color_t, color)
     LV_STYLE_HELPER(BackgroundOpacity, LV_STYLE_BG_OPA, num, uint8_t, opacity)
-    ALWAYS_INLINE FLATTEN void SetBackground(lv_color_t color, uint8_t opacity = 255)
-        { SetBackgroundColor(color); SetBackgroundOpacity(opacity); }
+    ALWAYS_INLINE FLATTEN void SetBackground(lv_color_t color, uint8_t opacity = 255, lv_style_selector_t selector = LV_PART_MAIN | LV_STATE_DEFAULT)
+        { SetBackgroundColor(color, selector); SetBackgroundOpacity(opacity, selector); }
 
     LV_STYLE_HELPER(BorderWidth, LV_STYLE_BORDER_WIDTH, num, int, width)
     LV_STYLE_HELPER(BorderColor, LV_STYLE_BORDER_COLOR, color, lv_color_t, color)
