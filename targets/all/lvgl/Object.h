@@ -17,7 +17,7 @@
 namespace lvgl
 {
 
-class Object;
+class ObjectWrapper;
 
 class ObjRef
 {
@@ -25,54 +25,21 @@ class ObjRef
 
 public:
     constexpr ObjRef(lv_obj_t* obj) : obj(obj) {}
-    constexpr ObjRef(const Object* obj);
-    constexpr ObjRef(const Object& obj);
+    constexpr ObjRef(const ObjectWrapper* obj);
+    constexpr ObjRef(const ObjectWrapper& obj);
 
     constexpr operator lv_obj_t*() const { return obj; }
 };
 
-class Object
+class ObjectWrapper
 {
 public:
-    typedef Object* (*factory_t)(ObjRef parent);
-    template<typename Type> static factory_t GetFactory()
-    {
-        return +[](ObjRef parent) { return (Object*)new Type(parent); };
-    }
-
-    // delete the copy ctor, it is very dangerous when invoked accidentally
-    Object(const Object&) = delete;
-
-    Object(const lv_obj_class_t& cls, ObjRef parent)
-    {
-        obj = lv_obj_class_create_obj(&cls, parent);
-        obj->user_data = this;
-        lv_obj_class_init_obj(obj);
-    }
-
-    virtual ~Object()
-    {
-        lv_obj_delete(obj);
-    }
+    ObjectWrapper(lv_obj_t* obj)
+        : obj(obj) {}
 
     constexpr lv_obj_t* Obj() const { return obj; }
     constexpr operator lv_obj_t*() const { return obj; }
-
-    void UpdateTree()
-    {
-        Update();
-
-        if (auto spec = obj->spec_attr)
-        {
-            for (int i = 0; i < spec->child_cnt; i++)
-            {
-                if (auto ud = spec->children[i]->user_data)
-                {
-                    ((Object*)ud)->UpdateTree();
-                }
-            }
-        }
-    }
+    constexpr ObjRef Ref() const { return this; }
 
     void SetPosition(int32_t x, int32_t y)
         { lv_obj_set_pos(obj, x, y); }
@@ -164,19 +131,20 @@ public:
     static constexpr lv_color_t ColorWhite = { 255, 255, 255 };
     static constexpr lv_color_t ColorBlack = { 0, 0, 0 };
 
-protected:
-    virtual void Update() {}
+    void AddFlag(lv_obj_flag_t flag) { lv_obj_add_flag(obj, flag); }
+    void AddState(lv_state_t state) { lv_obj_add_state(obj, state); }
+    void RemoveFlag(lv_obj_flag_t flag) { lv_obj_remove_flag(obj, flag); }
+    void RemoveState(lv_state_t state) { lv_obj_remove_state(obj, state); }
 
+    ObjectWrapper GetChild(int index) { return lv_obj_get_child(obj, index); }
+
+protected:
     template<auto Handler> void AddEvent(lv_event_code_t event = __EventThunk<Handler>::DefaultEvent)
     {
         lv_obj_add_event_cb(obj, __EventThunk<Handler>::cb, event, this);
     }
 
     void AddToGroup(lv_group_t* group = lv_group_get_default()) { lv_group_add_obj(group, obj); }
-    void AddFlag(lv_obj_flag_t flag) { lv_obj_add_flag(obj, flag); }
-    void AddState(lv_state_t state) { lv_obj_add_state(obj, state); }
-    void RemoveFlag(lv_obj_flag_t flag) { lv_obj_remove_flag(obj, flag); }
-    void RemoveState(lv_state_t state) { lv_obj_remove_state(obj, state); }
 
 private:
     lv_obj_t* obj = NULL;
@@ -186,7 +154,7 @@ private:
     {
         static void cb(lv_event_t* evt)
         {
-            (((Owner*)evt->user_data)->*Handler)(*evt);
+            (((Owner*)(ObjectWrapper*)evt->user_data)->*Handler)(*evt);
         }
     };
 
@@ -198,6 +166,52 @@ private:
             (((Owner*)evt->user_data)->*Handler)(*(lv_key_t*)evt->param);
         }
     };
+
+    friend class Object;
+};
+
+class Object : public ObjectWrapper
+{
+public:
+    typedef Object* (*factory_t)(ObjRef parent);
+    template<typename Type> static factory_t GetFactory()
+    {
+        return +[](ObjRef parent) { return (Object*)new Type(parent); };
+    }
+
+    // delete the copy ctor, it is very dangerous when invoked accidentally
+    Object(const Object&) = delete;
+
+    Object(const lv_obj_class_t& cls, ObjRef parent)
+        : ObjectWrapper(lv_obj_class_create_obj(&cls, parent))
+    {
+        obj->user_data = this;
+        lv_obj_class_init_obj(obj);
+    }
+
+    virtual ~Object()
+    {
+        lv_obj_delete(obj);
+    }
+
+    void UpdateTree()
+    {
+        Update();
+
+        if (auto spec = obj->spec_attr)
+        {
+            for (int i = 0; i < spec->child_cnt; i++)
+            {
+                if (auto ud = spec->children[i]->user_data)
+                {
+                    ((Object*)ud)->UpdateTree();
+                }
+            }
+        }
+    }
+
+protected:
+    virtual void Update() {}
 };
 
 template<typename LvType> constexpr const lv_obj_class_t& GetClass() { static_assert(false, "Unsupported lv_obj class"); return lv_obj_class; }
@@ -214,7 +228,7 @@ public:
         : Object(GetClass<LvType>(), parent) {}
 };
 
-constexpr ObjRef::ObjRef(const Object* obj) : obj(obj ? obj->Obj() : NULL) {}
-constexpr ObjRef::ObjRef(const Object& obj) : obj(obj.Obj()) {}
+constexpr ObjRef::ObjRef(const ObjectWrapper* obj) : obj(obj ? obj->Obj() : NULL) {}
+constexpr ObjRef::ObjRef(const ObjectWrapper& obj) : obj(obj.Obj()) {}
 
 }
