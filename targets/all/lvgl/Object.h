@@ -131,10 +131,13 @@ public:
     static constexpr lv_color_t ColorWhite = { 255, 255, 255 };
     static constexpr lv_color_t ColorBlack = { 0, 0, 0 };
 
+    void AddToGroup(lv_group_t* group = lv_group_get_default()) { lv_group_add_obj(group, obj); }
     void AddFlag(lv_obj_flag_t flag) { lv_obj_add_flag(obj, flag); }
     void AddState(lv_state_t state) { lv_obj_add_state(obj, state); }
     void RemoveFlag(lv_obj_flag_t flag) { lv_obj_remove_flag(obj, flag); }
     void RemoveState(lv_state_t state) { lv_obj_remove_state(obj, state); }
+
+    void Focus() { lv_group_focus_obj(obj); }
 
     ObjectWrapper GetChild(int index) { return lv_obj_get_child(obj, index); }
 
@@ -143,8 +146,6 @@ protected:
     {
         lv_obj_add_event_cb(obj, __EventThunk<Handler>::cb, event, this);
     }
-
-    void AddToGroup(lv_group_t* group = lv_group_get_default()) { lv_group_add_obj(group, obj); }
 
 private:
     lv_obj_t* obj = NULL;
