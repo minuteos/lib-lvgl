@@ -45,6 +45,8 @@ public:
         { lv_obj_set_pos(obj, x, y); }
     void SetSize(int32_t width, int32_t height)
         { lv_obj_set_size(obj, width, height); }
+    void SetVisible(bool visible)
+        { SetOpacity(visible ? LV_OPA_100 : LV_OPA_0); }
 
     void SetStyle(lv_style_prop_t prop, lv_style_value_t value, lv_style_selector_t selector = LV_PART_MAIN | LV_STATE_DEFAULT)
         { lv_obj_set_local_style_prop(obj, prop, value, selector); }
@@ -66,6 +68,7 @@ public:
     LV_STYLE_HELPER(Layout, LV_STYLE_LAYOUT, num, lv_layout_t, layout)
     LV_STYLE_HELPER(Align, LV_STYLE_ALIGN, num, lv_align_t, align)
     LV_STYLE_HELPER(Radius, LV_STYLE_RADIUS, num, int, radius)
+    LV_STYLE_HELPER(Opacity, LV_STYLE_OPA, num, uint8_t, opacity)
 
     LV_STYLE_HELPER(TranslateX, LV_STYLE_TRANSLATE_X, num, int, x)
     LV_STYLE_HELPER(TranslateY, LV_STYLE_TRANSLATE_Y, num, int, y)
