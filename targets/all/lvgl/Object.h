@@ -174,13 +174,32 @@ private:
     friend class Object;
 };
 
+template<typename T> class Model
+{
+protected:
+    const T* model;
+
+    friend class Object;
+};
+
 class Object : public ObjectWrapper
 {
 public:
-    typedef Object* (*factory_t)(ObjRef parent);
+    typedef Delegate<class Object*, ObjRef> factory_t;
+
     template<typename Type> static factory_t GetFactory()
     {
-        return +[](ObjRef parent) { return (Object*)new Type(parent); };
+        return +[](void*, ObjRef parent) { return (Object*)new Type(parent); };
+    }
+
+    template<typename Type, typename TModel> static factory_t GetFactory(const TModel& model)
+    {
+        return GetDelegate(
+            +[](void* model, ObjRef parent) {
+                auto o = new Type(parent);
+                ((lvgl::Model<TModel>*)o)->model = (const TModel*)model;
+                return (Object*)o;
+            }, (void*)&model);
     }
 
     // delete the copy ctor, it is very dangerous when invoked accidentally
