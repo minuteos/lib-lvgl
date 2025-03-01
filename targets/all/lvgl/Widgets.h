@@ -28,6 +28,10 @@ public:
         { lv_label_set_text(Obj(), text); }
     template<typename... Args> void SetTextFormat(const char* format, Args... args)
         { lv_label_set_text_fmt(*this, format, args...); }
+    void SetLongMode(lv_label_long_mode_t mode)
+        { lv_label_set_long_mode(*this, mode); }
+    lv_label_long_mode_t GetLongMode() const
+        { return lv_label_get_long_mode(*this); }
 };
 
 #endif
