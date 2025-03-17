@@ -23,7 +23,7 @@
 namespace lvgl
 {
 
-class Lvgl
+class Lvgl : kernel::WorkerStackAllocator
 {
 public:
     //! Intializes display of a specified size using the specified driver
@@ -36,6 +36,9 @@ private:
     void Invalidate(lv_area_t* area);
     static void LvFlush(lv_display_t* display, const lv_area_t* area, uint8_t* px_map);
     void Flush(const lv_area_t* area, uint8_t* px_map, size_t stride, bool last);
+
+    void* Allocate(size_t& size) override { size = LV_DRAW_THREAD_STACK_SIZE; return stack; }
+    void Free(void* stack) override { }
 
     Display* disp;
     AsyncDelegate<> render;

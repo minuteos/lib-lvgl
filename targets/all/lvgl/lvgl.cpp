@@ -130,8 +130,7 @@ async_def(
         f.start = MONO_US;
 #endif
         UNUSED auto wait = await(kernel::Worker::RunWithOptions, {
-            .stack = sizeof(stack),
-            .staticStack = stack,
+            .stackAlloc = this,
         }, lv_timer_handler);
 #if LVGL_DIAG & LVGL_DIAG_HANDLER
         MYDBG("Handler: %.3q ms, wait %d ms", MONO_US - f.start, wait);
@@ -143,8 +142,7 @@ async_def(
         f.start = MONO_US;
 #endif
         await(kernel::Worker::RunWithOptions, {
-            .stack = sizeof(stack),
-            .staticStack = stack,
+            .stackAlloc = this,
         }, _lv_display_refr_timer, (lv_timer_t*)NULL);
 #if LVGL_DIAG & LVGL_DIAG_REFRESH
         MYDBG("Refresh: %.3q ms", MONO_US - f.start);
