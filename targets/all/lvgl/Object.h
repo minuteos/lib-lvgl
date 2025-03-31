@@ -176,8 +176,11 @@ private:
 
 template<typename T> class Model
 {
+public:
+    void Bind(const T& model) { this->model = &model; }
+
 protected:
-    const T* model;
+    const T* model = NULL;
 
     friend class Object;
 };
@@ -197,7 +200,7 @@ public:
         return GetDelegate(
             +[](void* model, ObjRef parent) {
                 auto o = new Type(parent);
-                ((lvgl::Model<TModel>*)o)->model = (const TModel*)model;
+                static_cast<lvgl::Model<TModel>*>(o)->model = (const TModel*)model;
                 return (Object*)o;
             }, (void*)&model);
     }
