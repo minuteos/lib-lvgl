@@ -167,7 +167,7 @@ private:
         static constexpr lv_event_code_t DefaultEvent = LV_EVENT_KEY;
         static void cb(lv_event_t* evt)
         {
-            (((Owner*)evt->user_data)->*Handler)(*(lv_key_t*)evt->param);
+            (((Owner*)(ObjectWrapper*)evt->user_data)->*Handler)(*(lv_key_t*)evt->param);
         }
     };
 
