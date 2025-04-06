@@ -11,6 +11,7 @@
 #pragma once
 
 #include <lvgl/lvgl.h>
+#include <base/Span.h>
 
 #include <src/lvgl_private.h>
 
@@ -142,7 +143,15 @@ public:
 
     void Focus() { lv_group_focus_obj(obj); }
 
-    ObjectWrapper GetChild(int index) { return lv_obj_get_child(obj, index); }
+    TypedSpan<ObjectWrapper> GetChildren() const
+    {
+        return obj->spec_attr ?
+            Span(obj->spec_attr->children, obj->spec_attr->children + obj->spec_attr->child_cnt).Cast<ObjectWrapper>() :
+            TypedSpan<ObjectWrapper>();
+    }
+
+    bool HasUserData() const { return obj->user_data; }
+    template<typename T> T& UnsafeCast() const { return *static_cast<T*>((ObjectWrapper*)obj->user_data); }
 
 protected:
     template<auto Handler> void AddEvent(lv_event_code_t event = __EventThunk<Handler>::DefaultEvent)
@@ -158,7 +167,7 @@ private:
     {
         static void cb(lv_event_t* evt)
         {
-            (((Owner*)(ObjectWrapper*)evt->user_data)->*Handler)(*evt);
+            (static_cast<Owner*>((ObjectWrapper*)evt->user_data)->*Handler)(*evt);
         }
     };
 
@@ -167,7 +176,7 @@ private:
         static constexpr lv_event_code_t DefaultEvent = LV_EVENT_KEY;
         static void cb(lv_event_t* evt)
         {
-            (((Owner*)(ObjectWrapper*)evt->user_data)->*Handler)(*(lv_key_t*)evt->param);
+            (static_cast<Owner*>((ObjectWrapper*)evt->user_data)->*Handler)(*(lv_key_t*)evt->param);
         }
     };
 
@@ -207,34 +216,13 @@ public:
 
     // delete the copy ctor, it is very dangerous when invoked accidentally
     Object(const Object&) = delete;
+    Object(const lv_obj_class_t& cls, ObjRef parent);
 
-    Object(const lv_obj_class_t& cls, ObjRef parent)
-        : ObjectWrapper(lv_obj_class_create_obj(&cls, parent))
-    {
-        obj->user_data = this;
-        lv_obj_class_init_obj(obj);
-    }
+    virtual ~Object();
 
-    virtual ~Object()
-    {
-        lv_obj_delete(obj);
-    }
+    void UpdateTree();
 
-    void UpdateTree()
-    {
-        Update();
-
-        if (auto spec = obj->spec_attr)
-        {
-            for (int i = 0; i < spec->child_cnt; i++)
-            {
-                if (auto ud = spec->children[i]->user_data)
-                {
-                    ((Object*)ud)->UpdateTree();
-                }
-            }
-        }
-    }
+    ObjectWrapper GetParent() const { return obj->parent; }
 
 protected:
     virtual void Update() {}
