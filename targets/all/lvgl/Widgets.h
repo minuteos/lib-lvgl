@@ -27,11 +27,14 @@ public:
     void SetText(const char* text)
         { lv_label_set_text(Obj(), text); }
     template<typename... Args> void SetTextFormat(const char* format, Args... args)
-        { lv_label_set_text_fmt(*this, format, args...); }
+        { lv_label_set_text_fmt(Obj(), format, args...); }
+    const char* GetText() const
+        { return lv_label_get_text(Obj()); }
+
     void SetLongMode(lv_label_long_mode_t mode)
-        { lv_label_set_long_mode(*this, mode); }
+        { lv_label_set_long_mode(Obj(), mode); }
     lv_label_long_mode_t GetLongMode() const
-        { return lv_label_get_long_mode(*this); }
+        { return lv_label_get_long_mode(Obj()); }
 };
 
 #endif
