@@ -27,6 +27,16 @@ public:
 
     constexpr int32_t Width() const { return x2 - x1 + 1; }
     constexpr int32_t Height() const { return y2 - y1 + 1; }
+
+    constexpr bool operator ==(const Area& other) const
+    {
+        return x1 == other.x1 && x2 == other.x2 && y1 == other.y1 && y2 == other.y2;
+    }
+
+    constexpr bool operator !=(const Area& other) const
+    {
+        return x1 != other.x1 || x2 != other.x2 || y1 != other.y1 || y2 != other.y2;
+    }
 };
 
 }

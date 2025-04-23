@@ -148,6 +148,9 @@ public:
 
     void Focus() const { lv_group_focus_obj(obj); }
 
+    void Invalidate() const { lv_obj_invalidate(obj); }
+    void Invalidate(lv_area_t& area) const { lv_obj_invalidate_area(obj, &area); }
+
     TypedSpan<ObjectWrapper> GetChildren() const
     {
         return obj->spec_attr ?
