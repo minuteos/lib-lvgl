@@ -42,6 +42,8 @@ public:
     constexpr operator lv_obj_t*() const { return obj; }
     constexpr ObjRef Ref() const { return this; }
 
+    const Area& Coords() const { return *(const Area*)&obj->coords; }
+
     void SetPosition(int32_t x, int32_t y) const
         { lv_obj_set_pos(obj, x, y); }
     void SetSize(int32_t width, int32_t height) const

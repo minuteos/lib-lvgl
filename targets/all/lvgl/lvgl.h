@@ -14,6 +14,7 @@
 
 #include <lvgl.h>
 #include <lvgl/Display.h>
+#include <lvgl/Area.h>
 
 #include <lvgl/Object.h>
 #include <lvgl/Container.h>
