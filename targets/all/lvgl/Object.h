@@ -183,6 +183,15 @@ private:
         }
     };
 
+    template<typename Owner, void (Owner::*Handler)(lv_layer_t*)> struct __EventThunk<Handler>
+    {
+        static constexpr lv_event_code_t DefaultEvent = LV_EVENT_DRAW_MAIN;
+        static void cb(lv_event_t* evt)
+        {
+            (static_cast<Owner*>((ObjectWrapper*)evt->user_data)->*Handler)((lv_layer_t*)evt->param);
+        }
+    };
+
     friend class Object;
 };
 
