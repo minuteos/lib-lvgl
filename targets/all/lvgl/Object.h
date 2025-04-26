@@ -115,6 +115,7 @@ public:
 
     LV_STYLE_HELPER(TextColor, LV_STYLE_TEXT_COLOR, color, lv_color_t, color)
     LV_STYLE_HELPER(TextAlign, LV_STYLE_TEXT_ALIGN, num, lv_text_align_t, align)
+    LV_STYLE_HELPER(TextDecoration, LV_STYLE_TEXT_DECOR, num, lv_text_decor_t, decoration)
 
     LV_STYLE_HELPER(PaddingTop, LV_STYLE_PAD_TOP, num, int, padding)
     LV_STYLE_HELPER(PaddingBottom, LV_STYLE_PAD_BOTTOM, num, int, padding)
