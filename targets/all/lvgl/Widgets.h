@@ -51,4 +51,23 @@ public:
 
 #endif
 
+#if LV_USE_LIST
+
+struct lv_list_t : lv_obj_t {}; // there is no lv_list_t in LVGL
+
+LV_BIND_CLASS(lv_list_t, lv_list_class);
+
+class List : public LvObject<lv_list_t>
+{
+public:
+    List(ObjRef parent) : LvObject(parent) {}
+
+    ObjectWrapper AddText(const char* text)
+        { return lv_list_add_text(Obj(), text); }
+    ObjectWrapper AddButton(const void* icon, const char* text)
+        { return lv_list_add_button(Obj(), icon, text); }
+};
+
+#endif
+
 }
