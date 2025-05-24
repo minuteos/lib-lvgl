@@ -6,6 +6,11 @@
  * lvgl/lvgl.cpp
  */
 
+// generate the styles in lv_style.h
+#define LV_STYLE(name, ...) \
+    EXTERN_C const lv_style_const_prop_t name ## _props[] = { __VA_ARGS__, LV_STYLE_CONST_PROPS_END }; \
+    EXTERN_C LV_STYLE_CONST_INIT(name, (void*)(name ## _props))
+
 #include "lvgl.h"
 #include <src/lvgl_private.h>
 

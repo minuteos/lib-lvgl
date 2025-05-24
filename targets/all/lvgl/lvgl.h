@@ -50,3 +50,9 @@ private:
 extern Lvgl lvgl;
 
 }
+
+#ifndef LV_STYLE
+#define LV_STYLE(name, ...) extern const lv_style_t name
+#endif
+
+#include <lv_styles.h>
