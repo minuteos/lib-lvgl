@@ -139,12 +139,12 @@ public:
     static constexpr lv_color_t ColorBlack = { 0, 0, 0 };
 
     void AddToGroup(lv_group_t* group = lv_group_get_default()) const { lv_group_add_obj(group, obj); }
-    void AddFlag(lv_obj_flag_t flag) const { lv_obj_add_flag(obj, flag); }
+    void AddFlag(lv_obj_flag_t flag) const { if (!HasFlag(flag)) lv_obj_add_flag(obj, flag); }
     void AddState(lv_state_t state) const { lv_obj_add_state(obj, state); }
-    void AddStyle(const lv_style_t& style, lv_style_selector_t selector = LV_PART_MAIN | LV_STATE_DEFAULT) const { lv_obj_add_style(obj, &style, selector); }
-    void RemoveFlag(lv_obj_flag_t flag) const { lv_obj_remove_flag(obj, flag); }
+    void AddStyle(const lv_style_t& style, lv_style_selector_t selector = LV_PART_MAIN | LV_STATE_DEFAULT) const;
+    void RemoveFlag(lv_obj_flag_t flag) const { if (HasAnyFlag(flag)) lv_obj_remove_flag(obj, flag); }
     void RemoveState(lv_state_t state) const { lv_obj_remove_state(obj, state); }
-    void RemoveStyle(const lv_style_t& style, lv_style_selector_t selector = LV_PART_MAIN | LV_STATE_DEFAULT) const { lv_obj_remove_style(obj, &style, selector); }
+    void RemoveStyle(const lv_style_t& style, lv_style_selector_t selector = LV_PART_MAIN | LV_STATE_DEFAULT) const;
     void ClearStyle(lv_style_selector_t selector = LV_PART_MAIN | LV_STATE_DEFAULT) const { lv_obj_remove_style_all(obj); }
     bool HasFlag(lv_obj_flag_t flag) const { return (obj->flags & flag) == flag; }
     bool HasAnyFlag(lv_obj_flag_t flag) const { return obj->flags & flag; }
