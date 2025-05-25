@@ -35,6 +35,9 @@ public:
         { lv_label_set_long_mode(Obj(), mode); }
     lv_label_long_mode_t GetLongMode() const
         { return lv_label_get_long_mode(Obj()); }
+
+    void SetTextIfChanged(const char* text);
+    void SetTextFormatIfChanged(const char* format, ...);
 };
 
 #endif
