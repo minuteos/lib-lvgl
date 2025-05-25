@@ -183,6 +183,22 @@ private:
         }
     };
 
+    template<typename Owner, void (Owner::*Handler)(lv_event_t*)> struct __EventThunk<Handler>
+    {
+        static void cb(lv_event_t* evt)
+        {
+            (static_cast<Owner*>((ObjectWrapper*)evt->user_data)->*Handler)(evt);
+        }
+    };
+
+    template<typename Owner, void (Owner::*Handler)()> struct __EventThunk<Handler>
+    {
+        static void cb(lv_event_t* evt)
+        {
+            (static_cast<Owner*>((ObjectWrapper*)evt->user_data)->*Handler)();
+        }
+    };
+
     template<typename Owner, void (Owner::*Handler)(lv_key_t)> struct __EventThunk<Handler>
     {
         static constexpr lv_event_code_t DefaultEvent = LV_EVENT_KEY;
@@ -198,6 +214,15 @@ private:
         static void cb(lv_event_t* evt)
         {
             (static_cast<Owner*>((ObjectWrapper*)evt->user_data)->*Handler)((lv_layer_t*)evt->param);
+        }
+    };
+
+    template<typename Owner, void (Owner::*Handler)(lv_point_t*)> struct __EventThunk<Handler>
+    {
+        static constexpr lv_event_code_t DefaultEvent = LV_EVENT_GET_SELF_SIZE;
+        static void cb(lv_event_t* evt)
+        {
+            (static_cast<Owner*>((ObjectWrapper*)evt->user_data)->*Handler)((lv_point_t*)evt->param);
         }
     };
 
@@ -252,7 +277,7 @@ protected:
 template<typename LvType> constexpr const lv_obj_class_t& GetClass() { static_assert(false, "Unsupported lv_obj class"); return lv_obj_class; }
 
 #define LV_BIND_CLASS(tObj, tClass) \
-template<> constexpr const lv_obj_class_t& GetClass<tObj>() { return tClass; }
+template<> constexpr const lv_obj_class_t& ::lvgl::GetClass<tObj>() { return tClass; }
 
 LV_BIND_CLASS(lv_obj_t, lv_obj_class);
 
