@@ -51,8 +51,7 @@ public:
     void SetVisible(bool visible) const
         { SetOpacity(visible ? LV_OPA_100 : LV_OPA_0); }
 
-    void SetStyle(lv_style_prop_t prop, lv_style_value_t value, lv_style_selector_t selector = LV_PART_MAIN | LV_STATE_DEFAULT) const
-        { lv_obj_set_local_style_prop(obj, prop, value, selector); }
+    void SetStyle(lv_style_prop_t prop, lv_style_value_t value, lv_style_selector_t selector = LV_PART_MAIN | LV_STATE_DEFAULT) const;
     lv_style_value_t GetStyle(lv_style_prop_t prop, lv_part_t part = LV_PART_MAIN) const
         { return lv_obj_get_style_prop(obj, part, prop); }
 

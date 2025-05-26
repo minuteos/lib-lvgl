@@ -64,4 +64,16 @@ void ObjectWrapper::RemoveStyle(const lv_style_t& style, lv_style_selector_t sel
     }
 }
 
+void ObjectWrapper::SetStyle(lv_style_prop_t prop, lv_style_value_t value, lv_style_selector_t selector) const
+{
+    lv_style_value_t currentValue;
+    if (lv_obj_get_local_style_prop(obj, prop, &currentValue, selector) == LV_STYLE_RES_FOUND &&
+        currentValue.ptr == value.ptr)
+    {
+        return;
+    }
+
+    lv_obj_set_local_style_prop(obj, prop, value, selector);
+}
+
 }
